@@ -1,0 +1,130 @@
+<html  xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Home Page</title>
+    <meta id="csrf" th:name="_csrf" th:content="${_csrf.token}"/>
+    <meta th:name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <!-- HTTPS required. HTTP will give a 403 forbidden response -->
+    <script type="text/javascript">
+        window.fbAsyncInit = function() {
+            FB.init({
+                appId      : '624430304620726',
+                xfbml      : true,
+                version    : 'v3.2'
+            });
+            FB.AppEvents.logPageView();
+        };
+
+        (function(d, s, id){
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) {return;}
+            js = d.createElement(s); js.id = id;
+            js.src = "https://connect.facebook.net/en_US/sdk.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+    </script>
+</head>
+<body>
+
+
+<p>Welcome to home page</p>
+<h1>Facebook OTP Integration</h1>
+
+<div
+        class="fb-like"
+        data-share="true"
+        data-width="450"
+        data-show-faces="true">
+</div>
+
+
+<form method="get" action="https://www.accountkit.com/v1.0/basic/dialog/sms_login/">
+<input type="hidden" name="app_id" th:value="624430304620726">
+<input type="hidden" name="redirect" value="http://localhost:8080/login_success">
+<input type="hidden" name="state" th:value="${_csrf.token}">
+<input type="hidden" name="fbAppEventsEnabled" th:value=true>
+<input type="hidden" name="country_code" th:value="880">
+<input type="hidden" name="phone_number" th:value="1620456445">
+<button type="submit">Login</button>
+</form>
+
+<form method="get" action="https://www.accountkit.com/v1.0/basic/dialog/sms_login/">
+<input type="hidden" name="app_id" value="624430304620726"/>
+<input type="hidden" name="redirect" value="http://localhost:8080/"/>
+<input type="hidden" name="state" th:value="${_csrf.token}"/>
+<input type="hidden" name="fbAppEventsEnabled" value=true/>
+<input type="hidden" name="country_code" value="880"/>
+<input type="hidden" name="phone_number" value="1620456445"/>
+<input type="hidden" name="debug" value=true/>
+<input type="submit" value="Submit"/>
+</form>
+
+<input value="880" id="country_code" />
+<input placeholder="phone number" id="phone_number"/>
+<button onclick="smsLogin();">Login via SMS</button>
+
+</body>
+
+<script type="text/javascript">
+// initialize Account Kit with CSRF protection
+//{{${_csrf.token}}}
+//{{278510796204633}}{{v1.1}}{{localhost:8080/login_success}
+var token = "${_csrf.token}";
+console.log("CSRF: ",token);
+AccountKit_OnInteractive = function(){
+AccountKit.init(
+{
+appId:624430304620726,
+state:"csrf",
+version:"v3.2",
+fbAppEventsEnabled:true,
+redirect:"http://localhost:8080",
+debug: true
+}
+);
+};
+
+// login callback
+function loginCallback(response) {
+if (response.status === "PARTIALLY_AUTHENTICATED") {
+var code = response.code;
+var csrf = response.state;
+console.log("code: "+ code);
+console.log("CSRF: "+ csrf);
+// Send code to server to exchange for access token
+}
+else if (response.status === "NOT_AUTHENTICATED") {
+// handle authentication failure
+console.log("Not Authorized");
+}
+else if (response.status === "BAD_PARAMS") {
+// handle bad parameters
+console.log("Bad Parameter");
+console.log(response.status);
+}
+}
+
+// phone form submission handler
+function smsLogin() {
+var countryCode = document.getElementById("country_code").value;
+var phoneNumber = document.getElementById("phone_number").value;
+AccountKit.login(
+'PHONE',
+{countryCode: countryCode, phoneNumber: phoneNumber}, // will use default values if not specified
+loginCallback
+);
+}
+
+
+// email form submission handler
+function emailLogin() {
+var emailAddress = document.getElementById("email").value;
+AccountKit.login(
+'EMAIL',
+{emailAddress: emailAddress},
+loginCallback
+);
+}
+</script>
+
+
+</html>
