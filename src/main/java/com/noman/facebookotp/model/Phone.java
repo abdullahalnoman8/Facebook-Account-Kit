@@ -6,7 +6,7 @@ import lombok.Data;
 public class Phone {
     private String id;
     private String number;
-    private String country_prefix;
-    private String national_number;
+    private String countryPrefix;
+    private String nationalNumber;
 
 }
